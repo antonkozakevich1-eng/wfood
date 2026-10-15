@@ -518,6 +518,8 @@ wfood/
 | `npm run lint:fix` | ESLint с автофиксом |
 | `npm run typecheck` | Только проверка типов |
 | `npm run format` | Prettier |
+| `npm run check:sql` | Проверка структуры SQL-миграций (баланс скобок, `$$`-блоков) |
+| `npm run icons` | Перегенерация иконок PWA и OG-картинки (нужен Python + Pillow) |
 | `npm run supabase:push` | Применить миграции |
 | `npm run supabase:secrets` | Загрузить секреты Edge Functions |
 

@@ -15,6 +15,8 @@
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
+    "check:sql": "python scripts/check_sql.py",
+    "icons": "python scripts/generate_icons.py",
     "supabase:link": "supabase link",
     "supabase:push": "supabase db push",
     "supabase:secrets": "supabase secrets set --env-file ./supabase/.env.secrets"
