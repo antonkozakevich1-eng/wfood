@@ -1,0 +1,326 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   Тема WFOOD
+   Цвета в HSL-каналах (без hsl()), чтобы работали модификаторы прозрачности
+   Tailwind: bg-card/50, border-primary/20 и т.п.
+   ========================================================================== */
+
+@layer base {
+  :root {
+    --background: 33 100% 97%;        /* #FFF8F0 — тёплый кремовый */
+    --foreground: 20 14% 9%;          /* #1A1614 */
+    --card: 0 0% 100%;
+    --card-foreground: 20 14% 9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 14% 9%;
+    --muted: 30 30% 94%;
+    --muted-foreground: 20 8% 42%;
+    --border: 28 25% 88%;
+    --input: 28 25% 88%;
+    --ring: 16 100% 60%;              /* #FF6B35 */
+    --radius: 1rem;
+  }
+
+  .dark {
+    --background: 20 12% 9%;          /* #1A1614 */
+    --foreground: 0 0% 96%;           /* #F5F5F5 */
+    --card: 20 11% 13%;
+    --card-foreground: 0 0% 96%;
+    --popover: 20 11% 13%;
+    --popover-foreground: 0 0% 96%;
+    --muted: 20 9% 18%;
+    --muted-foreground: 25 10% 65%;
+    --border: 20 9% 22%;
+    --input: 20 9% 22%;
+    --ring: 16 100% 60%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    /* Отключаем «резинку» на iOS при скролле карты. */
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    /* 100dvh корректно учитывает адресную строку мобильного браузера. */
+    min-height: 100dvh;
+    overscroll-behavior-y: none;
+  }
+
+  /* Заголовки — «вкусный» serif Fraunces. */
+  h1,
+  h2,
+  h3 {
+    @apply font-display tracking-tight;
+  }
+
+  /* Фокус виден только при навигации с клавиатуры (не при тапе мышью). */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Уважаем системную настройку «уменьшить движение». */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Безопасные зоны iPhone: вырез и домашний индикатор. */
+  .safe-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .safe-x {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+
+  /* Высота экрана без учёта адресной строки. */
+  .h-screen-safe {
+    height: 100dvh;
+  }
+
+  /* Скрытый скроллбар: нужен для горизонтальных лент фильтров. */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Отступ снизу под фиксированную навигацию. */
+  .pb-nav {
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Нижняя граница для экранов с собственным полем ввода (чат).
+     Поле ввода должно подниматься НАД навигацией, а не уходить под неё. */
+  .pb-composer {
+    margin-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Скелетон: мягкий бегущий блик вместо серого прямоугольника. */
+  .skeleton {
+    @apply relative overflow-hidden rounded-xl bg-muted;
+  }
+
+  .skeleton::after {
+    @apply absolute inset-0 -translate-x-full animate-shimmer;
+    content: '';
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsl(var(--foreground) / 0.06),
+      transparent
+    );
+  }
+
+  /* Стеклянная подложка для липких панелей. */
+  .glass {
+    @apply bg-background/80 backdrop-blur-xl;
+  }
+}
+
+@layer utilities {
+  /* Обрезка текста в N строк. */
+  .line-clamp-1,
+  .line-clamp-2,
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-1 {
+    -webkit-line-clamp: 1;
+  }
+
+  .line-clamp-2 {
+    -webkit-line-clamp: 2;
+  }
+
+  .line-clamp-3 {
+    -webkit-line-clamp: 3;
+  }
+
+  /* Плавное появление снизу. */
+  .animate-in-up {
+    animation: fade-up 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+/* ==========================================================================
+   Leaflet
+   Переопределяем дефолтные стили, чтобы карта не выбивалась из дизайна.
+   ========================================================================== */
+
+.leaflet-container {
+  font-family: inherit;
+  background: hsl(var(--muted));
+  /* Иначе тап по карте вызывает зум-«резинку» на iOS. */
+  touch-action: pan-x pan-y;
+}
+
+.leaflet-control-attribution {
+  font-size: 9px;
+  background: hsl(var(--background) / 0.75) !important;
+  backdrop-filter: blur(4px);
+  border-radius: 6px 0 0 0;
+  padding: 1px 4px;
+}
+
+.dark .leaflet-control-attribution {
+  color: hsl(var(--muted-foreground));
+}
+
+.dark .leaflet-tile-pane {
+  /* Приглушаем светлые тайлы OSM в тёмной теме: иначе карта «светит» из тёмного UI. */
+  filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9) saturate(0.7);
+}
+
+.dark .leaflet-control-zoom a {
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
+  border-color: hsl(var(--border));
+}
+
+/* Пульсирующая точка текущего местоположения. */
+.user-location-marker {
+  position: relative;
+}
+
+.user-location-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: #2ec4b6;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.user-location-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: #2ec4b6;
+  animation: pulse-ring 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Маркер заведения. */
+.place-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  background: #ff6b35;
+  border: 2.5px solid #fff;
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.5);
+  font-size: 16px;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.place-marker:active {
+  transform: scale(0.9);
+}
+
+.place-marker--selected {
+  background: #2ec4b6;
+  box-shadow: 0 3px 12px rgba(46, 196, 182, 0.6);
+  transform: scale(1.15);
+  z-index: 1000;
+}
+
+.place-marker--closed {
+  background: #8a8580;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* Кластеры меток. */
+.marker-cluster-wfood {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: rgba(255, 107, 53, 0.9);
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  border: 2.5px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 10px rgba(255, 107, 53, 0.45);
+  transition: transform 0.2s ease-out;
+}
+
+.marker-cluster-wfood:hover {
+  transform: scale(1.1);
+}
+
+.marker-cluster-wfood--md {
+  background: rgba(237, 78, 20, 0.92);
+}
+
+.marker-cluster-wfood--lg {
+  background: rgba(196, 60, 12, 0.95);
+}
+
+/* Хвостик у маркера выбранного места — «указатель» на точку. */
+.place-marker-pin::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 7px solid #2ec4b6;
+}
+
+/* ==========================================================================
+   Прочее
+   ========================================================================== */
+
+/* Отключаем выделение текста на интерактивных элементах — как в нативном приложении. */
+button,
+[role='button'],
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Плавный скролл внутри bottom sheet. */
+.scroll-smooth-ios {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Скрываем стрелки у number-инпутов. */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

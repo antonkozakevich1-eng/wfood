@@ -1,0 +1,40 @@
+# Нормализация переносов строк: в репозитории всегда LF, на диске — как принято в ОС.
+# Без этого Windows-разработчик и Linux-CI видят весь файл изменённым.
+* text=auto eol=lf
+
+# Явно текстовые файлы
+*.ts    text eol=lf
+*.tsx   text eol=lf
+*.js    text eol=lf
+*.jsx   text eol=lf
+*.json  text eol=lf
+*.css   text eol=lf
+*.html  text eol=lf
+*.md    text eol=lf
+*.sql   text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.svg   text eol=lf
+
+# Windows-скрипты должны остаться с CRLF, иначе не запустятся
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+*.ps1   text eol=crlf
+
+# Бинарные файлы — не трогать и не пытаться диффить
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.eot   binary
+
+# Не показывать в diff'ах и в статистике GitHub
+package-lock.json  -diff linguist-generated
+pnpm-lock.yaml     -diff linguist-generated
+yarn.lock          -diff linguist-generated
+dist/**            export-ignore
